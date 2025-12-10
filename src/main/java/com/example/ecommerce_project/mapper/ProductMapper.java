@@ -1,5 +1,7 @@
-package com.example.ecommerce_project;
+package com.example.ecommerce_project.mapper;
 
+import com.example.ecommerce_project.Constant.ProductCategory;
+import com.example.ecommerce_project.modle.Product;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -10,9 +12,14 @@ public class ProductMapper implements RowMapper<Product> {
         Product product = new Product();
         product.setProduct_id(rs.getInt("product_id"));
         product.setProduct_name(rs.getString("product_name"));
-        product.setCategory(rs.getString("category"));
+
+//        String category =  rs.getString("category");
+//        ProductCategory product_cat = ProductCategory.valueOf(category);
+//        product.setCategory(product_cat);
+        product.setCategory(ProductCategory.valueOf(rs.getString("category")));
+
         product.setImage_url(rs.getString("image_url"));
-        product.getPrice(rs.getInt("price"));
+        product.setPrice(rs.getInt("price"));
         product.setStock(rs.getInt("stock"));
         product.setDescription(rs.getString("description"));
         product.setCreated_date(rs.getTimestamp("created_date"));

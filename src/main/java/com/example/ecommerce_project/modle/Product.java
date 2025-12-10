@@ -1,17 +1,22 @@
-package com.example.ecommerce_project;
+package com.example.ecommerce_project.modle;
 
+import com.example.ecommerce_project.Constant.ProductCategory;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class Product {
-    int product_id;
-    String product_name;
-    String category;
-    String image_url;
-    int price;
-    int stock;
-    String description;
-    Date created_date;
-    Date last_modified_date;
+
+
+    private int product_id;
+    private String product_name;
+    private ProductCategory category;
+    private String image_url;
+    private int price;
+    private int stock;
+    private String description;
+    private Date created_date;
+    private Date last_modified_date;
 
     public int getProduct_id() {
         return product_id;
@@ -29,11 +34,11 @@ public class Product {
         this.product_name = product_name;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 
@@ -45,7 +50,7 @@ public class Product {
         this.image_url = image_url;
     }
 
-    public int getPrice(int price) {
+    public int getPrice() {
         return this.price;
     }
 
