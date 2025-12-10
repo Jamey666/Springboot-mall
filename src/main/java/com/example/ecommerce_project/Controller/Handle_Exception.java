@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-
 public class Handle_Exception {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ProductDaoImp implements ProductDao{
@@ -53,4 +54,27 @@ public class ProductDaoImp implements ProductDao{
         namedParameterJdbcTemplate.update(sql,map,keyHolder);
         return keyHolder.getKey().intValue();
     }
+
+    @Override
+    public void updateProduct(Integer product_id, Map<String,Object> map) {
+        StringBuilder sb = new StringBuilder();
+        MapSqlParameterSource param_map = new MapSqlParameterSource();
+        sb.append("UPDATE product SET ");
+        int i = 0;
+        for(Map.Entry<String,Object> entry : map.entrySet()){
+            if(i!=0){
+                sb.append(",");
+            }
+            sb.append(entry.getKey()).append("=:").append(entry.getKey());
+            param_map.addValue(entry.getKey(),entry.getValue());
+            i++;
+        }
+        sb.append(" ,last_modified_date = Now()");
+        sb.append(" WHERE product_id = :product_id");
+        param_map.addValue("product_id",product_id);
+        String sql = sb.toString();
+        namedParameterJdbcTemplate.update(sql,param_map);
+    }
+
+
 }

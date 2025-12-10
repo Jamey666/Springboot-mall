@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class ProductController {
@@ -32,6 +34,18 @@ public class ProductController {
     public ResponseEntity<?> postOne(@Valid @RequestBody ProductRequest product) {
         Integer product_id = productService.CreateProduct(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.getProductById(product_id));
+    }
+
+    @PutMapping("/update/product/{id}")
+    public ResponseEntity<?> tes(@PathVariable Integer id,@RequestBody Map<String,Object> map){
+
+        Product get_product = productService.getProductById(id);
+        if (get_product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("此id為 " + id + " 之商品不存在!");
+        }
+
+        productService.updateProduct(id, map);
+        return ResponseEntity.ok().body(productService.getProductById(id));
     }
 
 
