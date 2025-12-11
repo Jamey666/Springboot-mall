@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,12 +22,30 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping("/products/{id}")
-    public ResponseEntity<Product> get(@PathVariable Integer id) {
+    public ResponseEntity<?> get(@PathVariable Integer id) {
         Product get_product = productService.getProductById(id);
         if (get_product  == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("現在還沒有id為 " + id + " 的商品喔TAT");
         }else  {
             return ResponseEntity.ok().body(get_product);
+        }
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> getProducts() {
+        return ResponseEntity.ok().body(productService.getProducts());
+    }
+
+    @GetMapping("/produts/findByCategory")
+    public ResponseEntity<?> getProductsByCategory(@RequestParam String category) {
+
+        ProductCategory.valueOf(category);//在此先確認有沒有這個category
+
+        List<Product> product_list = productService.getProductsByCategory(category);
+        if (product_list != null) {
+            return ResponseEntity.ok().body(product_list);
+        }else  {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("目前的category裡面沒有商品喔~");
         }
     }
 
@@ -38,7 +57,6 @@ public class ProductController {
 
     @PutMapping("/update/product/{id}")
     public ResponseEntity<?> tes(@PathVariable Integer id,@RequestBody Map<String,Object> map){
-
         Product get_product = productService.getProductById(id);
         if (get_product == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("此id為 " + id + " 之商品不存在!");
@@ -47,6 +65,14 @@ public class ProductController {
         productService.updateProduct(id, map);
         return ResponseEntity.ok().body(productService.getProductById(id));
     }
+
+    @DeleteMapping("/delete/product/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("已刪除id為 " + id + " 之Product~");
+    }
+
+
 
 
 

@@ -1,5 +1,6 @@
 package com.example.ecommerce_project.Dao;
 
+import com.example.ecommerce_project.Constant.ProductCategory;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
 import com.example.ecommerce_project.modle.Product;
 import com.example.ecommerce_project.mapper.ProductMapper;
@@ -26,7 +27,7 @@ public class ProductDaoImp implements ProductDao{
         String sql = "select * from product where product_id = :id";
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", id);
-        List<Product> get_product =  namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
+        List<Product> get_product = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
         if(get_product.size()>0){
             return get_product.get(0);
         }else {
@@ -62,6 +63,12 @@ public class ProductDaoImp implements ProductDao{
         sb.append("UPDATE product SET ");
         int i = 0;
         for(Map.Entry<String,Object> entry : map.entrySet()){
+            if(entry.getKey().equals("product_id") || entry.getKey().equals("created_date") || entry.getKey().equals("last_modified_date")){
+                throw new RuntimeException("created_date last_modified_date product_id 這三項是不能修改的歐~");
+            } // created_date last_modified_date product_id 不能改
+            if(entry.getKey().equals("category")){  //　如果要修改category 先檢查是否為有效值
+                ProductCategory.valueOf((String) entry.getValue()); //如果轉不過去就在這裡error
+            }
             if(i!=0){
                 sb.append(",");
             }
@@ -69,12 +76,39 @@ public class ProductDaoImp implements ProductDao{
             param_map.addValue(entry.getKey(),entry.getValue());
             i++;
         }
-        sb.append(" ,last_modified_date = Now()");
-        sb.append(" WHERE product_id = :product_id");
+        sb.append(" ,last_modified_date = Now() WHERE product_id = :product_id");
         param_map.addValue("product_id",product_id);
         String sql = sb.toString();
         namedParameterJdbcTemplate.update(sql,param_map);
     }
 
+    @Override
+    public void deleteProduct(Integer product_id) {
+        String sql = "delete from product where product_id = :product_id";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("product_id",product_id);
+        namedParameterJdbcTemplate.update(sql,map);
+    }
 
+    @Override
+    public List<Product> getProducts() {
+        String sql = "select * from product;";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
+        return product_list;
+    }
+
+    @Override
+    public List<Product> getProductsByCategory(String category) {
+        String sql = "select * from product where category = :category";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("category", category);
+
+        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
+        if (product_list.size()>0){
+            return product_list;
+        }else  {
+            return null;
+        }
+    }
 }
