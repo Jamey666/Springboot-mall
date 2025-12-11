@@ -1,7 +1,9 @@
 package com.example.ecommerce_project.Service;
 
+import com.example.ecommerce_project.Constant.ProductCategory;
 import com.example.ecommerce_project.Dao.ProductDao;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
+import com.example.ecommerce_project.dto_DataTransferObject.RequestParameter;
 import com.example.ecommerce_project.modle.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,12 +38,17 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public List<Product> getProducts() {
-        return productDao.getProducts();
+    public List<Product> getProducts(RequestParameter requestParameter) {
+        return productDao.getProducts(requestParameter);
     }
 
     @Override
-    public List<Product> getProductsByCategory(String category) {
-        return productDao.getProductsByCategory(category);
+    public Integer countProducts(RequestParameter requestParameter) {
+        return productDao.countProducts(requestParameter);
     }
+
+    //    @Override
+//    public List<Product> getProductsByCategory(String category) {
+//        return productDao.getProductsByCategory(category);
+//    }
 }

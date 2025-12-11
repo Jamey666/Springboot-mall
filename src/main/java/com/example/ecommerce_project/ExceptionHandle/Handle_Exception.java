@@ -1,11 +1,13 @@
 package com.example.ecommerce_project.ExceptionHandle;
 
 
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class Handle_Exception {
@@ -23,10 +25,12 @@ public class Handle_Exception {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleEnumError(IllegalArgumentException e) {
-        if (e.getMessage().contains("ProductCategory")) {
-            return ResponseEntity.badRequest().body("category 不合法，請傳入正確的商品分類");
-        }// 判斷是不是 enum 轉換失敗
-        return ResponseEntity.badRequest().body(e.getMessage());// 其它 IllegalArgumentException
+        return ResponseEntity.badRequest().body("category 不合法，請傳入正確的商品分類");
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleEnumError(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.badRequest().body("category 不合法，請傳入正確的商品分類");
     }
 
 }

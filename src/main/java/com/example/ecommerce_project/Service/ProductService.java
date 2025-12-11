@@ -1,6 +1,8 @@
 package com.example.ecommerce_project.Service;
 
+import com.example.ecommerce_project.Constant.ProductCategory;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
+import com.example.ecommerce_project.dto_DataTransferObject.RequestParameter;
 import com.example.ecommerce_project.modle.Product;
 
 import java.util.List;
@@ -8,8 +10,9 @@ import java.util.Map;
 
 public interface ProductService {
     Product getProductById(int id);
-    List<Product> getProducts();
-    List<Product> getProductsByCategory(String category);
+    List<Product> getProducts(RequestParameter requestParameter);
+    //List<Product> getProductsByCategory(String category);
+    Integer countProducts(RequestParameter requestParameter);
 
     Integer CreateProduct(ProductRequest product);
 

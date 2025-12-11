@@ -2,6 +2,7 @@ package com.example.ecommerce_project.Dao;
 
 import com.example.ecommerce_project.Constant.ProductCategory;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
+import com.example.ecommerce_project.dto_DataTransferObject.RequestParameter;
 import com.example.ecommerce_project.modle.Product;
 import com.example.ecommerce_project.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,24 +92,68 @@ public class ProductDaoImp implements ProductDao{
     }
 
     @Override
-    public List<Product> getProducts() {
-        String sql = "select * from product;";
+    public List<Product> getProducts(RequestParameter requestParameter) {
         MapSqlParameterSource map = new MapSqlParameterSource();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from product where 1=1 ");
+        if(requestParameter.getCategory()!=null){
+            sb.append("and category = :category");
+            map.addValue("category",requestParameter.getCategory().name());
+        }
+        if(requestParameter.getName()!=null){
+            sb.append(" and product_name like :name");
+            map.addValue("name","%"+requestParameter.getName()+"%");
+        }
+        sb.append(" order by " + requestParameter.getOrder()+" "+requestParameter.getSort());
+        sb.append(" limit :limit");
+        map.addValue("limit",requestParameter.getLimit());
+        sb.append(" OFFSET :offset");
+        map.addValue("offset",requestParameter.getOffset());
+        String sql = sb.toString();
         List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
         return product_list;
-    }
+    }// ex: select * from  product where product_name like '%B%' and category='CAR' order by price desc limit 2 offset 2;
 
     @Override
-    public List<Product> getProductsByCategory(String category) {
-        String sql = "select * from product where category = :category";
+    public Integer countProducts(RequestParameter requestParameter) {
         MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("category", category);
-
-        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
-        if (product_list.size()>0){
-            return product_list;
-        }else  {
-            return null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("select count(*) from product where 1=1 ");
+        if(requestParameter.getCategory()!=null){
+            sb.append("and category = :category");
+            map.addValue("category",requestParameter.getCategory().name());
         }
+        if(requestParameter.getName()!=null){
+            sb.append(" and product_name like :name");
+            map.addValue("name","%"+requestParameter.getName()+"%");
+        }
+        String sql = sb.toString();
+        return namedParameterJdbcTemplate.queryForObject(sql,map,Integer.class);
     }
+
+    //    @Override
+//    public List<Product> getProducts() {
+//        String sql = "select * from product";
+//        MapSqlParameterSource map = new MapSqlParameterSource();
+//        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
+//        return product_list;
+//    }
+//
+//    @Override
+//    public List<Product> getProductsByCategory(String category) {
+//        String sql = "select * from product where category = :category";
+//        MapSqlParameterSource map = new MapSqlParameterSource();
+//        map.addValue("category", category);
+//
+//        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
+//        if (product_list.size()>0){
+//            return product_list;
+//        }else  {
+//            return null;
+//        }
+//    }
+
+
+
+
 }
