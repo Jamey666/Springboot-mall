@@ -2,7 +2,7 @@ package com.example.ecommerce_project.Controller;
 
 
 import com.example.ecommerce_project.Constant.ProductCategory;
-import com.example.ecommerce_project.Service.ProductService;
+import com.example.ecommerce_project.Service.Product.ProductService;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
 import com.example.ecommerce_project.dto_DataTransferObject.RequestParameter;
 import com.example.ecommerce_project.modle.Product;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Validated
@@ -26,6 +24,12 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
+
+    @PostMapping("create/products")
+    public ResponseEntity<?> postOne(@Valid @RequestBody ProductRequest product) {
+        Integer product_id = productService.CreateProduct(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.getProductById(product_id));
+    }
 
     @GetMapping("/products/{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
@@ -39,10 +43,13 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<Page<Product>> getProducts(
+            //尋找商品範圍
               @RequestParam(required = false) ProductCategory category
             , @RequestParam(required = false) String name
+            //商品排序
             , @RequestParam(defaultValue = "created_date") String order
             , @RequestParam(defaultValue = "desc") String sort
+            //顯示幾筆資料&顯示方式
             , @RequestParam(defaultValue = "3") @Max(10)@Min(1) Integer limit
             , @RequestParam(defaultValue = "0") @Min(0) Integer offset) {
         RequestParameter requestParameter = new RequestParameter();
@@ -61,25 +68,6 @@ public class ProductController {
         return ResponseEntity.ok().body(page);
     }
 
-//    @GetMapping("/produts/findByCategory")
-//    public ResponseEntity<?> getProductsByCategory(@RequestParam String category) {
-//
-//        ProductCategory.valueOf(category);//在此先確認有沒有這個category
-//
-//        List<Product> product_list = productService.getProductsByCategory(category);
-//        if (product_list != null) {
-//            return ResponseEntity.ok().body(product_list);
-//        }else  {
-//            return ResponseEntity.status(HttpStatus.OK).body("目前的category裡面沒有商品喔~");
-//        }
-//    }
-
-    @PostMapping("/products")
-    public ResponseEntity<?> postOne(@Valid @RequestBody ProductRequest product) {
-        Integer product_id = productService.CreateProduct(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.getProductById(product_id));
-    }
-
     @PutMapping("/update/product/{id}")
     public ResponseEntity<?> tes(@PathVariable Integer id,@RequestBody Map<String,Object> map){
         Product get_product = productService.getProductById(id);
@@ -96,11 +84,4 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("已刪除id為 " + id + " 之Product~");
     }
-
-
-
-
-
-
-
 }

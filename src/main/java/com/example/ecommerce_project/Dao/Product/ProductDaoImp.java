@@ -1,4 +1,4 @@
-package com.example.ecommerce_project.Dao;
+package com.example.ecommerce_project.Dao.Product;
 
 import com.example.ecommerce_project.Constant.ProductCategory;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
@@ -16,12 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ProductDaoImp implements ProductDao{
+public class ProductDaoImp implements ProductDao {
 
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-
 
     @Override
     public Product getProductById(int id) {
@@ -50,8 +48,6 @@ public class ProductDaoImp implements ProductDao{
         map.addValue("price",product.getPrice());
         map.addValue("stock",product.getStock());
         map.addValue("description",product.getDescription());
-//        map.addValue("created_date", product.getCreated_date());
-//        map.addValue("last_modified_date", product.getLast_modified_date());
         KeyHolder keyHolder = new GeneratedKeyHolder();
         namedParameterJdbcTemplate.update(sql,map,keyHolder);
         return keyHolder.getKey().intValue();
@@ -96,64 +92,47 @@ public class ProductDaoImp implements ProductDao{
         MapSqlParameterSource map = new MapSqlParameterSource();
         StringBuilder sb = new StringBuilder();
         sb.append("select * from product where 1=1 ");
-        if(requestParameter.getCategory()!=null){
-            sb.append("and category = :category");
-            map.addValue("category",requestParameter.getCategory().name());
-        }
-        if(requestParameter.getName()!=null){
-            sb.append(" and product_name like :name");
-            map.addValue("name","%"+requestParameter.getName()+"%");
-        }
-        sb.append(" order by " + requestParameter.getOrder()+" "+requestParameter.getSort());
-        sb.append(" limit :limit");
+
+        sql_filter_builder(sb,map,requestParameter);
+
+        sb.append(" order by " + requestParameter.getOrder()+" "+requestParameter.getSort()
+                + " limit :limit" + " OFFSET :offset");
         map.addValue("limit",requestParameter.getLimit());
-        sb.append(" OFFSET :offset");
         map.addValue("offset",requestParameter.getOffset());
         String sql = sb.toString();
         List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
         return product_list;
-    }// ex: select * from  product where product_name like '%B%' and category='CAR' order by price desc limit 2 offset 2;
+    }
 
     @Override
     public Integer countProducts(RequestParameter requestParameter) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         StringBuilder sb = new StringBuilder();
         sb.append("select count(*) from product where 1=1 ");
-        if(requestParameter.getCategory()!=null){
-            sb.append("and category = :category");
-            map.addValue("category",requestParameter.getCategory().name());
-        }
-        if(requestParameter.getName()!=null){
-            sb.append(" and product_name like :name");
-            map.addValue("name","%"+requestParameter.getName()+"%");
-        }
+
+        sql_filter_builder(sb,map,requestParameter);
+
         String sql = sb.toString();
         return namedParameterJdbcTemplate.queryForObject(sql,map,Integer.class);
     }
 
-    //    @Override
-//    public List<Product> getProducts() {
-//        String sql = "select * from product";
-//        MapSqlParameterSource map = new MapSqlParameterSource();
-//        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
-//        return product_list;
-//    }
-//
-//    @Override
-//    public List<Product> getProductsByCategory(String category) {
-//        String sql = "select * from product where category = :category";
-//        MapSqlParameterSource map = new MapSqlParameterSource();
-//        map.addValue("category", category);
-//
-//        List<Product> product_list = namedParameterJdbcTemplate.query(sql,map,new ProductMapper());
-//        if (product_list.size()>0){
-//            return product_list;
-//        }else  {
-//            return null;
-//        }
-//    }
+    private void sql_filter_builder(StringBuilder sb, MapSqlParameterSource map,RequestParameter requestParameter){
+        if(requestParameter.getCategory()!=null){
+            sb.append(" and category = :category ");
+            map.addValue("category",requestParameter.getCategory().name());
+        }
+        if(requestParameter.getName()!=null){
+            sb.append(" and product_name like :name ");
+            map.addValue("name","%"+requestParameter.getName()+"%");
+        }
+    }
 
-
-
-
+    @Override
+    public void updateStock(Integer product_id, Integer stock) {
+        String sql = "update product set stock = :stock, last_modified_date=Now()  where product_id = :product_id";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("stock",stock);
+        map.addValue("product_id",product_id);
+        namedParameterJdbcTemplate.update(sql,map);
+    }
 }

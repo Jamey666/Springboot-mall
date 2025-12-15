@@ -1,7 +1,6 @@
-package com.example.ecommerce_project.Service;
+package com.example.ecommerce_project.Service.Product;
 
-import com.example.ecommerce_project.Constant.ProductCategory;
-import com.example.ecommerce_project.Dao.ProductDao;
+import com.example.ecommerce_project.Dao.Product.ProductDao;
 import com.example.ecommerce_project.dto_DataTransferObject.ProductRequest;
 import com.example.ecommerce_project.dto_DataTransferObject.RequestParameter;
 import com.example.ecommerce_project.modle.Product;
@@ -47,8 +46,7 @@ public class ProductServiceImp implements ProductService {
         return productDao.countProducts(requestParameter);
     }
 
-    //    @Override
-//    public List<Product> getProductsByCategory(String category) {
-//        return productDao.getProductsByCategory(category);
-//    }
+
+
+
 }
