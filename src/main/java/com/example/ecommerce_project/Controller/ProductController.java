@@ -34,11 +34,7 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
         Product get_product = productService.getProductById(id);
-        if (get_product  == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("現在還沒有id為 " + id + " 的商品喔TAT");
-        }else  {
-            return ResponseEntity.ok().body(get_product);
-        }
+        return ResponseEntity.ok().body(get_product);
     }
 
     @GetMapping("/products")
@@ -70,11 +66,6 @@ public class ProductController {
 
     @PutMapping("/update/product/{id}")
     public ResponseEntity<?> tes(@PathVariable Integer id,@RequestBody Map<String,Object> map){
-        Product get_product = productService.getProductById(id);
-        if (get_product == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("此id為 " + id + " 之商品不存在!");
-        }
-
         productService.updateProduct(id, map);
         return ResponseEntity.ok().body(productService.getProductById(id));
     }
